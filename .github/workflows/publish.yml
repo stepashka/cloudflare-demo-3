@@ -24,7 +24,8 @@ jobs:
 
       - id: deploy
         run: |
-          echo "DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }}" >> wrangler.toml
+          echo "[env.production]" >> wrangler.toml
+          echo "  DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }}" >> wrangler.toml
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
