@@ -16,38 +16,19 @@ jobs:
       - id: create-branch
         uses: neondatabase/create-branch-action@v5
         with:
+          username: "neondb_owner"
+          api_key: ${{ secrets.NEON_API_KEY }}
           project_id: ${{ secrets.NEON_PROJECT_ID }}
-          username: "neondb_owner" # Change this to the role you use to connect to your database
-          # parent: dev # optional (defaults to your primary branch)
           branch_name: preview/${{ steps.branch-name.outputs.current_branch }}
-          api_key: ${{ secrets.NEON_API_KEY }} # Generate an API key in your Neon account settings
-
-      - id: deploy
+      - id: add-neon-env-wrangler
         run: |
           echo "[vars]" >> wrangler.toml
           echo "DATABASE_URL = \"${{ steps.create-branch.outputs.db_url_with_pooler }}\"" >> wrangler.toml
-          echo wrangler.toml
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
-      - name: Install deps
+      - name: Install Project Dependencies
         run: npm install
-      - name: Run the build
+      - name: Build the project
         run: npm run build
-
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: b14076a63f14946d1240aa7d2642ad9f
-          projectName: cloudflare-demo-3
-          directory: dist
-          # Optional: Enable this if you want to have GitHub Deployments triggered
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          # Optional: Switch what branch you are publishing to.
-          # By default this will be the branch which triggered this workflow
-          branch: ${{ steps.branch-name.outputs.current_branch }}
-          # Optional: Change the working directory
-          # workingDirectory: my-site
-          # Optional: Change the Wrangler version, allows you to point to a specific version or a tag such as `beta`
-          wranglerVersion: '3'
+      - name: Publish to CF Pages
+        run: CLOUDFLARE_ACCOUNT_ID=b14076a63f14946d1240aa7d2642ad9f CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} npx wrangler@latest pages deploy --project-name="cloudflare-demo-3"
