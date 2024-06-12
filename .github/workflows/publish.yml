@@ -10,15 +10,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Get git branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v8
+      - id: create-branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          username: "neondb_owner" # Change this to the role you use to connect to your database
+          # parent: dev # optional (defaults to your primary branch)
+          branch_name: preview/${{ steps.branch-name.outputs.current_branch }}
+          api_key: ${{ secrets.NEON_API_KEY }} # Generate an API key in your Neon account settings
+
+      - id: deploy
+        run: |
+          echo "DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }}" >> .env
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
       - name: Install deps
         run: npm install
       - name: Run the build
         run: npm run build
-      - name: Get git branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v8
+
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
