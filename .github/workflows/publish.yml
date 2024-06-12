@@ -32,4 +32,4 @@ jobs:
       - name: Run the build
         run: npm run build
       - name: Publish to Cloudflare Pages
-        run: CLOUDFLARE_ACCOUNT_ID=b14076a63f14946d1240aa7d2642ad9f CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} npx wrangler@latest pages deploy ./dist --project-name="cloudflare-demo-3"
+        run: CLOUDFLARE_ACCOUNT_ID=b14076a63f14946d1240aa7d2642ad9f CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} npx wrangler@latest pages deploy --project-name="cloudflare-demo-3"
