@@ -20,6 +20,11 @@ jobs:
           username: "neondb_owner"
           branch_name: preview/${{ steps.branch-name.outputs.current_branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
+      - id: deploy
+        run: |
+          echo "[vars]" >> wrangler.toml
+          echo "DATABASE_URL = \"${{ steps.create-branch.outputs.db_url_with_pooler }}\"" >> wrangler.toml
+          echo wrangler.toml
       - name: Setup Node.js
         uses: actions/setup-node@v4
       - name: Install deps
@@ -27,4 +32,4 @@ jobs:
       - name: Run the build
         run: npm run build
       - name: Publish to Cloudflare Pages
-        run: CLOUDFLARE_ACCOUNT_ID=b14076a63f14946d1240aa7d2642ad9f CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} npx wrangler@latest pages deploy ./dist --project-name="cloudflare-demo-3" --var DATABASE_URL:\"${{ steps.create-branch.outputs.db_url_with_pooler }}\"
+        run: CLOUDFLARE_ACCOUNT_ID=b14076a63f14946d1240aa7d2642ad9f CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }} npx wrangler@latest pages deploy ./dist --project-name="cloudflare-demo-3"
